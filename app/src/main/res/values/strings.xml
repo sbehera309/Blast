@@ -1,4 +1,25 @@
 <resources>
     <string name="app_name">Blast</string>
     <string name="play_button">Play</string>
+    <string name="easy_button">Easy</string>
+    <string name="medium_button">Medium</string>
+    <string name="hard_button">Hard</string>
+    <string name="try_again">Try Again</string>
+    <string name="highscore">High Score</string>
+    <string name="score">Score: </string>
+    <string name="first">1st.</string>
+    <string name="second">2nd.</string>
+    <string name="third">3rd.</string>
+    <string name="total_score">Score:</string>
+    <string name="total_enemy_hit">Saitamas Hit:</string>
+    <string name="total_ki_blasts">Ki Blasts Absorbed:</string>
+    <string name="total_games_played">Games Played:</string>
+    <string name="total">Total</string>
+    <string name="average_score">Average Score:</string>
+    <string name="average_hits">Average Saitamas killed</string>
+    <string name="average_blasts">Average Ki Blasts Absorbed:</string>
+    <string name="average">Average</string>
+    <string name="stat">Statistics</string>
+    <string name="menu_button">Menu Button</string>
+    <string name="stat_button">Stats</string>
 </resources>

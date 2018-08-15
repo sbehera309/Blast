@@ -23,7 +23,7 @@ public class LevelActivity extends AppCompatActivity implements View.OnClickList
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_level_test);
+        setContentView(R.layout.activity_main);
 
         leftoright = AnimationUtils.loadAnimation(this, R.anim.lefttoright);
         righttoleft = AnimationUtils.loadAnimation(this,R.anim.righttoleft);

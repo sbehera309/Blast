@@ -13,20 +13,21 @@ import com.game.sbehe_000.blast.R;
 
 public class Goku {
     private Bitmap bitmap;
-    private Bitmap[] frames = new Bitmap[2];
+    private Bitmap[] frames = new Bitmap[6];
     private Bitmap[] shootingframes = new Bitmap[14];
 
     private boolean isShooting;
+    private boolean isHit;
     private int shootingcount;
 
-    private int x;
-    private int y;
+    private float x;
+    private float y;
 
-    private int maxY;
-    private int minY;
+    private float maxY;
+    private float minY;
 
-    private int speed = 10;
-    private int gravity = 10;
+    private float speed = 10;
+    private float gravity = 10;
 
     private final int MIN_SPEED = 1;
     private final int MAX_SPEED = 20;
@@ -36,13 +37,17 @@ public class Goku {
 
     private Rect GokuDetect;
 
-    public Goku(Context context, int screenX, int screenY){
+    public Goku(Context context, float screenX, float screenY){
         x = 55;
         y = 750;
         speed = 5;
 
-        frames[0] = BitmapFactory.decodeResource(context.getResources(), R.drawable.player1);
-        frames[1] = BitmapFactory.decodeResource(context.getResources(), R.drawable.player2);
+        frames[0] = BitmapFactory.decodeResource(context.getResources(), R.drawable.playeraura1);
+        frames[1] = BitmapFactory.decodeResource(context.getResources(), R.drawable.playeraura4);
+        frames[2] = BitmapFactory.decodeResource(context.getResources(),R.drawable.playeraura2);
+        frames[3] = BitmapFactory.decodeResource(context.getResources(), R.drawable.playeraura5);
+        frames[4] = BitmapFactory.decodeResource(context.getResources(), R.drawable.playeraura3);
+        frames[5] = BitmapFactory.decodeResource(context.getResources(), R.drawable.playeraura6);
         shootingframes[0] = BitmapFactory.decodeResource(context.getResources(), R.drawable.gokuattack);
         shootingframes[1] = BitmapFactory.decodeResource(context.getResources(), R.drawable.gokuattack1);
         shootingframes[2] = BitmapFactory.decodeResource(context.getResources(), R.drawable.gokuattack2);
@@ -62,24 +67,42 @@ public class Goku {
         maxY = screenY - bitmap.getHeight();
         minY = 0;
 
-        GokuDetect = new Rect(x, y, bitmap.getWidth(), bitmap.getHeight());
+        GokuDetect = new Rect((int)x, (int)y, bitmap.getWidth() - 5, bitmap.getHeight()-5);
 
         count = 0;
         isShooting = false;
+        isHit = false;
         shootingcount = 0;
     }
 
     public void update(){
         //updating x coordinate
 
-        if(isShooting == false){
+        if(isHit){
+            gravity = 0;
+        }
+
+        if(!isShooting){
             if(count <= 15){
                 bitmap = frames[1];
                 count++;
-            }else if(count > 15 && count < 30){
+            }else if(count > 15 && count <= 30){
+                bitmap = frames[2];
+                count++;
+            }else if(count > 30 && count <= 45){
+                bitmap = frames[3];
+                count++;
+            }else if(count > 45 && count <= 60){
+                bitmap = frames[4];
+                count++;
+            }else if(count > 60 && count < 75){
+                bitmap = frames[5];
+                count++;
+            }else if(count >=75 && count < 90){
                 bitmap = frames[0];
                 count++;
-            }else{
+            }
+            else{
                 count = 0;
             }
             if(y < 0){
@@ -142,14 +165,15 @@ public class Goku {
             }
 
         }
-        GokuDetect.left = x;
-        GokuDetect.top = y;
-        GokuDetect.right = x + bitmap.getWidth();
-        GokuDetect.bottom = y + bitmap.getHeight();
+        GokuDetect.left = (int)x;
+        GokuDetect.top = (int)y;
+        GokuDetect.right = (int)x + bitmap.getWidth() - 5;
+        GokuDetect.bottom = (int)y + bitmap.getHeight() - 5;
     }
 
     public void isFlying(){
-        y -= 250;
+            y -= 250;
+
     }
 
     public Rect getGokuDetect(){
@@ -164,6 +188,16 @@ public class Goku {
         kicount= kicount - 2;
         isShooting = true;
     }
+    public void setHit(){
+        isHit = true;
+    }
+    public boolean isHit(){
+        if(isHit){
+            return true;
+        }else{
+            return false;
+        }
+    }
     public boolean isFiring(){
         if(isShooting){
             return true;
@@ -176,15 +210,15 @@ public class Goku {
         return bitmap;
     }
 
-    public int getX() {
+    public float getX() {
         return x;
     }
 
-    public int getY() {
+    public float getY() {
         return y;
     }
 
-    public int getSpeed() {
+    public float getSpeed() {
         return speed;
     }
 

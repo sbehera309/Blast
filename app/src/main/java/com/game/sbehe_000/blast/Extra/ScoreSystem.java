@@ -33,10 +33,10 @@ public class ScoreSystem {
         numbers[8] = BitmapFactory.decodeResource(context.getResources(),R.drawable.eight);
         numbers[9] = BitmapFactory.decodeResource(context.getResources(),R.drawable.nine);
 
-        x0= 500;
-        x1 = 600;
-        x2 = 700;
-        x3 = 800;
+        x0 = 350;
+        x1 = 450;
+        x2 = 550;
+        x3 = 650;
 
         y0 = -400;
         y1 = -400;

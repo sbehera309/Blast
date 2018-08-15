@@ -18,17 +18,17 @@ public class Saitama {
     private Bitmap[] frames = new Bitmap[2];
     int framecount;
 
-    int x;
-    int y;
-    int maxX;
-    int maxY;
-    int minX;
-    int minY;
-    int speed = 1;
+    float x;
+    float y;
+    float maxX;
+    float maxY;
+    float minX;
+    float minY;
+    float speed = 1;
 
     private Rect collisionDetect;
 
-    public Saitama(Context context, int screenX, int screenY){
+    public Saitama(Context context, float screenX, float screenY){
         //Get the frames for the image
         frames[0] = BitmapFactory.decodeResource(context.getResources(), R.drawable.testonep1);
         frames[1] = BitmapFactory.decodeResource(context.getResources(), R.drawable.testonep2);
@@ -47,17 +47,17 @@ public class Saitama {
         //generating a random coordinate to add enemy
         Random generator = new Random();
         speed = generator.nextInt(6) + 10;
-        x = screenX + generator.nextInt(maxX);
-        y = generator.nextInt(maxY) - saitama_image.getHeight();
+        x = screenX + generator.nextInt((int)maxX);
+        y = generator.nextInt((int)maxY) - saitama_image.getHeight();
         if(y < 0){
             y = 0;
         }
 
         //Initialize the detection box
-        collisionDetect = new Rect(x, y, saitama_image.getWidth(),saitama_image.getHeight() );
+        collisionDetect = new Rect((int)x, (int)y, saitama_image.getWidth(),saitama_image.getHeight() );
     }
 
-    public void update(int playerSpeed){
+    public void update(float playerSpeed){
         //Make the object move from right to left
         x -= playerSpeed;
         x -= speed;
@@ -79,17 +79,17 @@ public class Saitama {
             Random generator = new Random();
             speed = generator.nextInt(10) + 10;
             x = maxX;
-            y = generator.nextInt(maxY) - saitama_image.getHeight();
+            y = generator.nextInt((int)maxY) - saitama_image.getHeight();
             if(y < 0){
                 y = 0;
             }
         }
 
         //Change detection boxes
-        collisionDetect.left = x;
-        collisionDetect.top = y;
-        collisionDetect.right = x + saitama_image.getWidth();
-        collisionDetect.bottom = y + saitama_image.getHeight();
+        collisionDetect.left = (int)x;
+        collisionDetect.top = (int)y;
+        collisionDetect.right = (int)x + saitama_image.getWidth();
+        collisionDetect.bottom = (int) y + saitama_image.getHeight();
     }
 
     public Bitmap getSaitama_image(){
@@ -104,23 +104,23 @@ public class Saitama {
         Random generator = new Random();
         speed = generator.nextInt(10) + 10;
         x = maxX;
-        y = generator.nextInt(maxY) - saitama_image.getHeight();
+        y = generator.nextInt((int)maxY) - saitama_image.getHeight();
         if(y < 0){
             y = 0;
         }
 
         //Change detection boxes
-        collisionDetect.left = x;
-        collisionDetect.top = y;
-        collisionDetect.right = x + saitama_image.getWidth();
-        collisionDetect.bottom = y + saitama_image.getHeight();
+        collisionDetect.left = (int)x;
+        collisionDetect.top = (int)y;
+        collisionDetect.right = (int)x + saitama_image.getWidth();
+        collisionDetect.bottom = (int)y + saitama_image.getHeight();
     }
 
-    public int getX() {
+    public float getX() {
         return x;
     }
 
-    public int getY() {
+    public float getY() {
         return y;
     }
 

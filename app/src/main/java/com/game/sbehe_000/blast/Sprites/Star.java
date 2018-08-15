@@ -7,16 +7,16 @@ import java.util.Random;
  */
 
 public class Star {
-    private int x;
-    private int y;
-    private int speed;
+    private float x;
+    private float y;
+    private float speed;
 
-    private int maxX;
-    private int maxY;
-    private int minX;
-    private int minY;
+    private float maxX;
+    private float maxY;
+    private float minX;
+    private float minY;
 
-    public Star(int screenX, int screenY) {
+    public Star(float screenX, float screenY) {
         maxX = screenX;
         maxY = screenY;
         minX = 0;
@@ -26,11 +26,11 @@ public class Star {
 
         //generating a random coordinate
         //but keeping the coordinate inside the screen size
-        x = generator.nextInt(maxX);
-        y = generator.nextInt(maxY);
+        x = generator.nextInt((int)maxX);
+        y = generator.nextInt((int)maxY);
     }
 
-    public void update(int playerSpeed) {
+    public void update(float playerSpeed) {
         //animating the star horizontally left side
         //by decreasing x coordinate with player speed
         x -= playerSpeed;
@@ -41,7 +41,7 @@ public class Star {
             //this will give a infinite scrolling background effect
             x = maxX;
             Random generator = new Random();
-            y = generator.nextInt(maxY);
+            y = generator.nextInt((int)maxY);
             speed = generator.nextInt(15);
         }
     }
@@ -56,11 +56,11 @@ public class Star {
         return finalX;
     }
 
-    public int getX() {
+    public float getX() {
         return x;
     }
 
-    public int getY() {
+    public float getY() {
         return y;
     }
 }

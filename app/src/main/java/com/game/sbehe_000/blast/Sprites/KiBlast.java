@@ -15,13 +15,13 @@ public class KiBlast {
     private Bitmap kiblast;
     private Bitmap[] frames = new Bitmap[10];
 
-    private int x;
-    private int y;
+    private float x;
+    private float y;
 
     private boolean readytogo;
 
-    private int maxY;
-    private int minY;
+    private float maxY;
+    private float minY;
 
     private int shootingcount;
 
@@ -47,7 +47,7 @@ public class KiBlast {
         //Set the visibile bitmap
         kiblast = frames[9];
 
-        kiDetect = new Rect(x ,y, kiblast.getWidth(), kiblast.getHeight());
+        kiDetect = new Rect((int)x ,(int)y, kiblast.getWidth(), kiblast.getHeight());
         shootingcount = 90;
         readytogo = false;
     }
@@ -93,19 +93,19 @@ public class KiBlast {
                 y = -250;
             }
 
-            kiDetect.left = x;
-            kiDetect.top = y;
-            kiDetect.right = x + kiblast.getWidth();
-            kiDetect.bottom = y + kiblast.getHeight();
+            kiDetect.left = (int)x;
+            kiDetect.top = (int)y;
+            kiDetect.right = (int)x + kiblast.getWidth();
+            kiDetect.bottom = (int)y + kiblast.getHeight();
         }
     }
 
     //Use the setters to make it visible at the time of the shot
-    public void setX(int x) {
+    public void setX(float x) {
         this.x = x;
     }
 
-    public void setY(int y) {
+    public void setY(float y) {
         this.y = y;
     }
 
@@ -125,11 +125,11 @@ public class KiBlast {
         return kiDetect;
     }
 
-    public int getX() {
+    public float getX() {
         return x;
     }
 
-    public int getY() {
+    public float getY() {
         return y;
     }
 

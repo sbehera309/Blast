@@ -22,20 +22,20 @@ public class TopTubes {
     private Bitmap[] frames = new Bitmap[4];
     private int count;
 
-    private int x;
-    private int y;
+    private float x;
+    private float y;
 
-    private int speed = 1;
+    private float speed = 1;
 
-    private int maxX;
-    private int minX;
+    private float maxX;
+    private float minX;
 
-    private int maxY;
-    private int minY;
+    private float maxY;
+    private float minY;
 
     private Rect collisionDetect;
 
-    public TopTubes(Context context, int screenX, int screenY){
+    public TopTubes(Context context, float screenX, float screenY){
         //getting bitmap from drawable resource
         frames[0] = BitmapFactory.decodeResource(context.getResources(), R.drawable.testki1);
         frames[1] = BitmapFactory.decodeResource(context.getResources(), R.drawable.testki2);
@@ -54,17 +54,17 @@ public class TopTubes {
         //generating a random coordinate to add enemy
         Random generator = new Random();
         speed = generator.nextInt(6) + 10;
-        x = screenX + generator.nextInt(maxX);
-        y = generator.nextInt(maxY) - toptube_image.getHeight();
+        x = screenX + generator.nextInt((int)maxX);
+        y = generator.nextInt((int)maxY) - toptube_image.getHeight();
         if(y < 0){
             y = 0 + toptube_image.getHeight();
         }
 
         //Initialize detection box
-        collisionDetect = new Rect(x, y, toptube_image.getWidth(), toptube_image.getHeight());
+        collisionDetect = new Rect((int)x ,(int)y, toptube_image.getWidth(), toptube_image.getHeight());
     }
 
-    public void update(int playerSpeed) {
+    public void update(float playerSpeed) {
         //decreasing x coordinate so that enemy will move right to left
         x -= playerSpeed;
         x -= speed;
@@ -89,17 +89,17 @@ public class TopTubes {
             Random generator = new Random();
             speed = generator.nextInt(10) + 10;
             x = maxX;
-            y = generator.nextInt(maxY) - toptube_image.getHeight();
+            y = generator.nextInt((int)maxY) - toptube_image.getHeight();
             if(y < 0){
                 y = 0 + toptube_image.getHeight();
             }
         }
 
         //Change detection boxes
-        collisionDetect.left = x;
-        collisionDetect.top = y;
-        collisionDetect.right = x + toptube_image.getWidth();
-        collisionDetect.bottom = y + toptube_image.getHeight();
+        collisionDetect.left = (int)x;
+        collisionDetect.top = (int) y;
+        collisionDetect.right = (int)x + toptube_image.getWidth();
+        collisionDetect.bottom = (int)y + toptube_image.getHeight();
 
     }
 
@@ -115,25 +115,25 @@ public class TopTubes {
         //Reposition the actual image
         Random generator = new Random();
         speed = generator.nextInt(6) + 10;
-        x = screenX + generator.nextInt(maxX);
-        y = generator.nextInt(maxY) - toptube_image.getHeight();
+        x = screenX + generator.nextInt((int)maxX);
+        y = generator.nextInt((int)maxY) - toptube_image.getHeight();
 
         //Reposition the hit box according to the image
-        collisionDetect.left = x;
-        collisionDetect.top = y;
-        collisionDetect.right = x + toptube_image.getWidth();
-        collisionDetect.bottom = y + toptube_image.getHeight();
+        collisionDetect.left = (int)x;
+        collisionDetect.top = (int)y;
+        collisionDetect.right = (int)x + toptube_image.getWidth();
+        collisionDetect.bottom = (int) y + toptube_image.getHeight();
     }
 
-    public int getX() {
+    public float getX() {
         return x;
     }
 
-    public int getY() {
+    public float getY() {
         return y;
     }
 
-    public int getSpeed() {
+    public float getSpeed() {
         return speed;
     }
 }

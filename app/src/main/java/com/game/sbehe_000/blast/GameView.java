@@ -1,8 +1,7 @@
 package com.game.sbehe_000.blast;
 
+
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -10,15 +9,16 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.Typeface;
 import android.support.v4.view.GestureDetectorCompat;
-import android.support.v7.app.AlertDialog;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.widget.Toast;
 
+import com.game.sbehe_000.blast.Extra.CustomDialogClass;
 import com.game.sbehe_000.blast.Extra.ScoreSystem;
+import com.game.sbehe_000.blast.Extra.SoundPlayer;
 import com.game.sbehe_000.blast.Sprites.Goku;
 import com.game.sbehe_000.blast.Sprites.KiBlast;
 import com.game.sbehe_000.blast.Sprites.OnePunch;
@@ -37,7 +37,10 @@ public class GameView extends SurfaceView implements Runnable {
     volatile boolean playing;
     private int game_level;
     private boolean isGameOver;
+    private boolean newHighScore;
     Context context;
+
+    private SoundPlayer soundPlayer;
 
     private GestureDetectorCompat mDetector;
 
@@ -70,6 +73,7 @@ public class GameView extends SurfaceView implements Runnable {
 
     //Declare the drawing objects
     private Paint paint;
+   //private TextPaint textPaint;
     private Canvas canvas;
     private SurfaceHolder surfaceHolder;
 
@@ -77,18 +81,24 @@ public class GameView extends SurfaceView implements Runnable {
 
     //the score holder
     int score;
+    int enemy_hit_count;
+    int ki_blast_collected;
 
     //the high Scores Holder
     int highScore[] = new int[3];
 
-    //Shared Prefernces to store the High Scores
+    //Shared Preferences to store the High Scores
     SharedPreferences sharedPreferences;
 
     public GameView(Context context,int screenX, int screenY , int level){
         super(context);
 
         this.context = context;
+
+        soundPlayer = new SoundPlayer(context);
+
         isGameOver = false;
+        newHighScore = false;
 
         //Initialize the Gesture class
         mDetector = new GestureDetectorCompat(context, new MyGestureListener());
@@ -140,6 +150,8 @@ public class GameView extends SurfaceView implements Runnable {
 
         //setting the score to 0 initially
         score = 0;
+        enemy_hit_count = 0;
+        ki_blast_collected = 0;
 
         this.scoreSystem = new ScoreSystem(context);
 
@@ -153,6 +165,7 @@ public class GameView extends SurfaceView implements Runnable {
         //Initialize the drawing objects
         surfaceHolder = getHolder();
         paint = new Paint();
+        //textPaint = new TextPaint();
     }
 
     @Override
@@ -168,9 +181,54 @@ public class GameView extends SurfaceView implements Runnable {
 
     private void update(){
         goku.update();
+        onePunch.update();
+        //onePunch.setX(-250);
+        //onePunch.setY(-250);
 
-        onePunch.setX(-250);
-        onePunch.setY(-250);
+        if(goku.isHit()){
+            onePunch.isActive();
+            onePunch.setX(goku.getX() + goku.getBitmap().getWidth());
+            onePunch.setY(goku.getY());
+            if(onePunch.isAnimeDone()) {
+                playing = false;
+                isGameOver = true;
+                if(sharedPreferences.getInt("score1", 0) < score){
+                    newHighScore = true;
+                }
+
+                for (int b = 0; b < 3; b++) {
+                    if (highScore[b] < score) {
+                        final int finalI = b;
+                        highScore[b] = score;
+                        break;
+                    }
+                }
+                SharedPreferences.Editor e = sharedPreferences.edit();
+                int total_score;
+                int total_game;
+                int total_enemy_hit;
+                int total_ki_blast_collected;
+                total_ki_blast_collected = sharedPreferences.getInt("total_blast",0);
+                total_ki_blast_collected = total_ki_blast_collected + ki_blast_collected;
+                total_enemy_hit = sharedPreferences.getInt("total_enemy", 0);
+                total_enemy_hit = total_enemy_hit + enemy_hit_count;
+                total_score = sharedPreferences.getInt("total_score", 0);
+                total_score = total_score + score;
+                total_game = sharedPreferences.getInt("total_game", 0);
+                total_game++;
+                SharedPreferences.Editor a = sharedPreferences.edit();
+                a.putInt("total_score", total_score);
+                a.putInt("total_game", total_game);
+                a.putInt("total_enemy", total_enemy_hit);
+                a.putInt("total_blast", total_ki_blast_collected);
+                a.apply();
+                for (int b = 0; b < 3; b++) {
+                    int c = b + 1;
+                    e.putInt("score" + c, highScore[b]);
+                }
+                e.apply();
+            }
+        }else{
 
         if(this.scoreSystem.getZeroth() == 0){
             this.scoreSystem.setY0(-255);
@@ -209,6 +267,8 @@ public class GameView extends SurfaceView implements Runnable {
             if(Rect.intersects(goku.getGokuDetect(),enemies[i].getCollisionDetect())){
                 kiBlaststorage++;
                 score++;
+                ki_blast_collected++;
+                soundPlayer.playGainItemSound();
                 enemies[i].repositionBlast(tempscreenx, tempscreeny);
                 goku.gotKiBlast();
                 this.scoreSystem.splitScore(score);
@@ -239,24 +299,12 @@ public class GameView extends SurfaceView implements Runnable {
             if(Rect.intersects(goku.getGokuDetect(), saitamas[i].getCollisionDetect())){
 
                 if(!goku.isFiring()) {
-                    onePunch.setX(goku.getX() + goku.getBitmap().getWidth());
-                    onePunch.setY(goku.getY());
+                    goku.setHit();
+
+                    soundPlayer.playPunchSound();
+
                     saitamas[i].repositionSaitama(tempscreenx, tempscreeny);
-                    playing = false;
-                    isGameOver = true;
-                    for(int b = 0; b < 3; b++){
-                        if(highScore[b]< score){
-                            final int finalI = b;
-                            highScore[b] = score;
-                            break;
-                        }
-                    }
-                    SharedPreferences.Editor e = sharedPreferences.edit();
-                    for(int b = 0; b < 3; b++){
-                        int a = b + 1;
-                        e.putInt("score" + a, highScore[b]);
-                    }
-                    e.apply();
+
                 }
 
             }
@@ -265,10 +313,13 @@ public class GameView extends SurfaceView implements Runnable {
         for(int i = 0 ; i < kiBlastcount; i++){
             kiBlasts[i].update();
 
+            //When Goku fires on Saitama
             if(Rect.intersects(kiBlasts[i].getKiDetect(), saitamas[0].getCollisionDetect())){
                 if(kiBlasts[i].getReadytogo()){
                     saitamas[0].repositionSaitama(tempscreenx, tempscreeny);
                     score = score + 4;
+                    soundPlayer.playExplosionSound();
+                    enemy_hit_count++;
                     this.scoreSystem.splitScore(score);
                     if(this.scoreSystem.getZeroth() > 0){
                         this.scoreSystem.setY0(0);
@@ -285,6 +336,8 @@ public class GameView extends SurfaceView implements Runnable {
                 if(kiBlasts[i].getReadytogo()) {
                     saitamas[1].repositionSaitama(tempscreenx, tempscreeny);
                     score = score + 4;
+                    soundPlayer.playExplosionSound();
+                    enemy_hit_count++;
                     this.scoreSystem.splitScore(score);
                     if(this.scoreSystem.getZeroth() > 0){
                         this.scoreSystem.setY0(0);
@@ -301,6 +354,8 @@ public class GameView extends SurfaceView implements Runnable {
                 if(kiBlasts[i].getReadytogo()){
                     saitamas[2].repositionSaitama(tempscreenx, tempscreeny);
                     score = score +4;
+                    soundPlayer.playExplosionSound();
+                    enemy_hit_count++;
                     this.scoreSystem.splitScore(score);
                     if(this.scoreSystem.getZeroth() > 0){
                         this.scoreSystem.setY0(0);
@@ -313,6 +368,7 @@ public class GameView extends SurfaceView implements Runnable {
                     }
                 }
             }
+        }
         }
     }
 
@@ -392,11 +448,24 @@ public class GameView extends SurfaceView implements Runnable {
 
             //Draw the GameOver sign
             if(isGameOver){
+                Paint strokepaint = new Paint();
+                strokepaint.setTextSize(150);
+                strokepaint.setTextAlign(Paint.Align.CENTER);
+                strokepaint.setStyle(Paint.Style.STROKE);
+                strokepaint.setStrokeWidth(10);
+                strokepaint.setColor(Color.CYAN);
+                strokepaint.setTypeface(Typeface.create("impact", Typeface.BOLD));
+
                 paint.setTextSize(150);
                 paint.setTextAlign(Paint.Align.CENTER);
+                paint.setColor(Color.WHITE);
+                paint.setTypeface(Typeface.create("Impact",Typeface.BOLD));
 
                 int yPos=(int) ((canvas.getHeight() / 2) - ((paint.descent() + paint.ascent()) / 2));
-                canvas.drawText("Game Over",canvas.getWidth()/2,yPos,paint);
+
+                canvas.drawText("Game Over", canvas.getWidth()/2, yPos - 350, strokepaint);
+                canvas.drawText("Game Over",canvas.getWidth()/2,yPos - 350,paint);
+
             }
 
             //Draw the Score at the top
@@ -413,7 +482,7 @@ public class GameView extends SurfaceView implements Runnable {
 
     private void control(){
         try {
-            gameThread.sleep(7);
+            gameThread.sleep(2);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -461,16 +530,16 @@ public class GameView extends SurfaceView implements Runnable {
                 //Toast.makeText(context, "Swiped right to left", Toast.LENGTH_LONG).show();
 
             }else{
-                //float temp = e1.getX() -  e2.getX();
-                //String tempval = Float.toString(temp);
-                //Toast.makeText(context, tempval, Toast.LENGTH_LONG).show();
-                if(kiBlaststorage >= 2){
-                    goku.shootKiBlast();
-                    kiBlasts[0].setX(goku.getX() + goku.getBitmap().getWidth() - 10);
-                    kiBlasts[0].setY(goku.getY() + 40);
-                    kiBlasts[0].setReadytogo(true);
-                    kiBlaststorage = kiBlaststorage - 2;
-                    score = score - 2;
+                if(!goku.isHit()){
+                    if(kiBlaststorage >= 2){
+                        goku.shootKiBlast();
+                        kiBlasts[0].setX(goku.getX() + goku.getBitmap().getWidth() - 10);
+                        kiBlasts[0].setY(goku.getY() + 40);
+                        kiBlasts[0].setReadytogo(true);
+                        soundPlayer.playShootSound();
+                        kiBlaststorage = kiBlaststorage - 2;
+                        score = score - 2;
+                    }
                 }
             }
 
@@ -479,28 +548,24 @@ public class GameView extends SurfaceView implements Runnable {
 
         @Override
         public boolean onDown(MotionEvent e) {
-            if(!goku.isFiring()){
-                goku.isFlying();
+            if(!goku.isHit()){
+                if(!goku.isFiring()){
+                    goku.isFlying();
+                }
             }
-            //goku.isFlying();
             if(isGameOver){
-                //context.startActivity(new Intent(context, MainActivity.class));
-                AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                builder.setMessage("Are you sure you want to go back to main menu").setCancelable(false)
-                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                context.startActivity(new Intent(context, MainActivity.class));
-                            }
-                        })
-                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                dialog.cancel();
-                            }
-                        });
-                AlertDialog alert = builder.create();
-                alert.show();
+                //Getting the average score and saving number of saitama's hits
+                int total_score;
+                int total_game;
+                total_score = sharedPreferences.getInt("total_score", 0);
+                total_game = sharedPreferences.getInt("total_game", 0);
+
+
+                CustomDialogClass cdc = new CustomDialogClass(context, game_level,score,sharedPreferences.getInt("score1", 0),newHighScore);
+                cdc.show();
             }
             return true;
         }
+
     }
 }
